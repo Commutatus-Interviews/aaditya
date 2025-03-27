@@ -1,0 +1,10 @@
+<h1>Expenses by <%= @user.email %></h1>
+<% @expenses.each do |expense| %>
+  <div>
+    <p>Date: <%= expense.date %></p>
+    <p>Description: <%= expense.description %></p>
+    <p>Amount: <%= number_to_currency(expense.amount) %></p>
+    <p>Paid by: <%= expense.payer.email %></p>
+    <p>Participants: <%= expense.participants.map(&:email).join(', ') %></p>
+  </div>
+<% end %>

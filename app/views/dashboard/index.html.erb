@@ -1,0 +1,4 @@
+<h3>Friends You Owe</h3>
+<% @user.friends_you_owe.each do |friend, amount| %>
+  <p><%= friend.email %>: <%= number_to_currency(amount) %></p>
+<% end %>

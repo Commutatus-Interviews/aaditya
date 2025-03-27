@@ -1,0 +1,18 @@
+<%= form_with(model: @expense, local: true) do |form| %>
+  <%= form.label :payer_id, "Who paid?" %>
+  <%= form.collection_select :payer_id, User.all, :id, :email, {}, { class: 'form-control' } %>
+
+  <%= form.label :participant_ids, "Participants" %>
+  <%= form.collection_select :participant_ids, User.all, :id, :email, {}, { multiple: true, class: 'form-control' } %>
+
+  <%= form.label :amount, "Amount" %>
+  <%= form.number_field :amount, step: :any, class: 'form-control' %>
+
+  <%= form.label :description, "Description" %>
+  <%= form.text_field :description, class: 'form-control' %>
+
+  <%= form.label :date, "Date" %>
+  <%= form.date_field :date, class: 'form-control' %>
+
+  <%= form.submit "Add Expense", class: 'btn btn-primary' %>
+<% end %>
