@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
   devise_for :users
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  root "dashboard#index"
 
-  root to: "static#dashboard"
-  get 'people/:id', to: 'static#person'
+  resources :expenses, only: [:new, :create, :index]
+  resources :payments, only: [:new, :create]
+  resources :people, only: [:show]  # Friend page
 end
