@@ -1,0 +1,27 @@
+<h1>Settle Up</h1>
+
+<%= form_with(model: @payment, local: true) do |f| %>
+  <div>
+    <%= f.label :payee_id, "Select Friend" %>
+    <%= f.collection_select :payee_id, @friends, :id, :email %>
+  </div>
+
+  <div>
+    <%= f.label :amount %>
+    <%= f.number_field :amount, step: 0.01 %>
+  </div>
+
+  <div>
+    <%= f.label :notes %>
+    <%= f.text_area :notes %>
+  </div>
+
+  <!-- Automatically assign the current user as the payer -->
+  <div style="display:none;">
+    <%= f.hidden_field :payer_id, value: current_user.id %>
+  </div>
+
+  <div>
+    <%= f.submit "Submit Payment" %>
+  </div>
+<% end %>

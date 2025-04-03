@@ -1,0 +1,25 @@
+<h1>Dashboard</h1>
+
+<p>Total Balance: <%= number_to_currency(@balance) %></p>
+<p>Total You Owe: <%= number_to_currency(@total_you_owe) %></p>
+<p>Total Due To You: <%= number_to_currency(@total_due_to_you) %></p>
+
+<h2>Your Expenses</h2>
+<% @expenses.each do |expense| %>
+  <p>
+    <strong><%= expense.description %></strong> - 
+    <%= number_to_currency(expense.total_amount) %> on <%= expense.date %>
+  </p>
+<% end %>
+
+<h2>Friends Who Owe You</h2>
+<% @friends_who_owe_you.each do |friend_id, amount| %>
+  <% friend = User.find(friend_id) %>
+  <p><%= friend.email %>: <%= number_to_currency(amount) %></p>
+<% end %>
+
+<h2>Friends You Owe</h2>
+<% @owed_friends.each do |friend_id, amount| %>
+  <% friend = User.find(friend_id) %>
+  <p><%= friend.email %>: <%= number_to_currency(amount) %></p>
+<% end %>
