@@ -13,6 +13,10 @@
       </div>
     <% end %>
 
+    <% if flash[:alert] %>
+      <div class="alert alert-warning"><%= flash[:alert] %></div>
+    <% end %>
+
     <div class="mb-3">
       <%= form.label :description, class: "form-label" %>
       <%= form.text_field :description, class: "form-control" %>
@@ -41,13 +45,30 @@
       </div>
     </div>
 
-    <!-- Checkbox list for users to split with -->
-    <div class="mb-3">
-      <h4>Split With:</h4>
+    <!-- Container for Equal Splits -->
+    <div class="mb-3" id="equal-split-container">
+      <h4>Split With (Equal Split):</h4>
       <% User.where.not(id: current_user.id).each do |user| %>
         <div class="form-check">
-          <%= check_box_tag "split_with_users[]", user.id, false, class: "form-check-input", id: "split_with_users_#{user.id}" %>
-          <%= label_tag "split_with_users_#{user.id}", user.email, class: "form-check-label" %>
+          <%= check_box_tag "split_with_users[]", user.id, false, class: "form-check-input", id: "equal_split_user_#{user.id}" %>
+          <%= label_tag "equal_split_user_#{user.id}", user.email, class: "form-check-label" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Container for Unequal Splits -->
+    <div class="mb-3" id="unequal-split-container" style="display: none;">
+      <h4>Enter Amounts for Unequal Split:</h4>
+      <p class="small text-muted">
+        Note: The sum of all individual amounts must equal the total expense amount.
+      </p>
+      <% User.where.not(id: current_user.id).each do |user| %>
+        <div class="input-group mb-2">
+          <div class="input-group-text">
+            <%= check_box_tag "split_with_users[]", user.id, false, class: "form-check-input", id: "unequal_split_user_#{user.id}" %>
+          </div>
+          <%= label_tag "unequal_split_user_#{user.id}", user.email, class: "input-group-text" %>
+          <%= text_field_tag "splits[#{user.id}]", nil, placeholder: "Enter amount", class: "form-control" %>
         </div>
       <% end %>
     </div>
@@ -58,3 +79,27 @@
     </div>
   <% end %>
 </div>
+
+<!-- Inline JavaScript to toggle split containers -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const equalRadio = document.getElementById("split_type_equal");
+    const unequalRadio = document.getElementById("split_type_unequal");
+    const equalContainer = document.getElementById("equal-split-container");
+    const unequalContainer = document.getElementById("unequal-split-container");
+
+    function toggleSplitContainers() {
+      if (unequalRadio.checked) {
+        unequalContainer.style.display = "block";
+        equalContainer.style.display = "none";
+      } else {
+        unequalContainer.style.display = "none";
+        equalContainer.style.display = "block";
+      }
+    }
+
+    equalRadio.addEventListener("change", toggleSplitContainers);
+    unequalRadio.addEventListener("change", toggleSplitContainers);
+    toggleSplitContainers();
+  });
+</script>

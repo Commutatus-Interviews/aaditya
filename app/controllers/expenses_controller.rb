@@ -11,13 +11,19 @@ class ExpensesController < ApplicationController
     @expense.user = current_user  # Automatically assign the current user as the payer
 
     if params[:split_type] == "equal"
-      # Use the checkboxes value from "split_with_users[]"
+      # For equal splits, use the selected user IDs (from split_with_users checkboxes)
       @expense.split_equal(params[:split_with_users])
     elsif params[:split_type] == "unequal"
-      # For unequal splits you would need a separate input field to enter amounts per user.
-      # This example assumes you're passing a hash of user_id => amount in params[:splits].
-      splits = params[:splits].transform_values(&:to_d)
-      return render :new unless @expense.split_unequal(splits)
+      # For unequal splits, we expect params[:splits] to be provided as a hash (user_id => amount)
+      if params[:splits].present?
+        splits = params[:splits].transform_values(&:to_d)
+        # Validate that the sum equals the total_amount inside the split_unequal method.
+        return render :new unless @expense.split_unequal(splits)
+      else
+        flash.now[:alert] = "Please provide split amounts for unequal split."
+        @users = User.where.not(id: current_user.id)
+        return render :new
+      end
     end
 
     if @expense.save
@@ -31,7 +37,7 @@ class ExpensesController < ApplicationController
   private
 
   def expense_params
-    # Exclude :user_id because it's automatically assigned
+    # Exclude :user_id because it's automatically assigned as current_user.
     params.require(:expense).permit(:date, :description, :total_amount)
   end
 end
