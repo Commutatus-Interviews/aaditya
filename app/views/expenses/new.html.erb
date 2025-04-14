@@ -1,0 +1,105 @@
+<div class="container my-4">
+  <h1 class="text-center mb-4">Add a New Expense</h1>
+
+  <%= form_with(model: @expense, local: true) do |form| %>
+    <% if @expense.errors.any? %>
+      <div class="alert alert-danger">
+        <h4><%= pluralize(@expense.errors.count, "error") %> prohibited this expense from being saved:</h4>
+        <ul>
+          <% @expense.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <% if flash[:alert] %>
+      <div class="alert alert-warning"><%= flash[:alert] %></div>
+    <% end %>
+
+    <div class="mb-3">
+      <%= form.label :description, class: "form-label" %>
+      <%= form.text_field :description, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :total_amount, class: "form-label" %>
+      <%= form.number_field :total_amount, step: 0.01, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :date, class: "form-label" %>
+      <%= form.date_field :date, class: "form-control" %>
+    </div>
+
+    <!-- Split Type selection -->
+    <div class="mb-3">
+      <h4>Split Type:</h4>
+      <div class="form-check form-check-inline">
+        <%= radio_button_tag :split_type, "equal", true, class: "form-check-input", id: "split_type_equal" %>
+        <%= label_tag "split_type_equal", "Equal", class: "form-check-label me-3" %>
+      </div>
+      <div class="form-check form-check-inline">
+        <%= radio_button_tag :split_type, "unequal", false, class: "form-check-input", id: "split_type_unequal" %>
+        <%= label_tag "split_type_unequal", "Unequal", class: "form-check-label" %>
+      </div>
+    </div>
+
+    <!-- Container for Equal Splits -->
+    <div class="mb-3" id="equal-split-container">
+      <h4>Split With (Equal Split):</h4>
+      <% User.where.not(id: current_user.id).each do |user| %>
+        <div class="form-check">
+          <%= check_box_tag "split_with_users[]", user.id, false, class: "form-check-input", id: "equal_split_user_#{user.id}" %>
+          <%= label_tag "equal_split_user_#{user.id}", user.email, class: "form-check-label" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Container for Unequal Splits -->
+    <div class="mb-3" id="unequal-split-container" style="display: none;">
+      <h4>Enter Amounts for Unequal Split:</h4>
+      <p class="small text-muted">
+        Note: The sum of all individual amounts must equal the total expense amount.
+      </p>
+      <% User.where.not(id: current_user.id).each do |user| %>
+        <div class="input-group mb-2">
+          <div class="input-group-text">
+            <%= check_box_tag "split_with_users[]", user.id, false, class: "form-check-input", id: "unequal_split_user_#{user.id}" %>
+          </div>
+          <%= label_tag "unequal_split_user_#{user.id}", user.email, class: "input-group-text" %>
+          <%= text_field_tag "splits[#{user.id}]", nil, placeholder: "Enter amount", class: "form-control" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.submit "Create Expense", class: "btn btn-primary" %>
+      <%= link_to "Cancel", root_path, class: "btn btn-secondary ms-2" %>
+    </div>
+  <% end %>
+</div>
+
+<!-- Inline JavaScript to toggle split containers -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const equalRadio = document.getElementById("split_type_equal");
+    const unequalRadio = document.getElementById("split_type_unequal");
+    const equalContainer = document.getElementById("equal-split-container");
+    const unequalContainer = document.getElementById("unequal-split-container");
+
+    function toggleSplitContainers() {
+      if (unequalRadio.checked) {
+        unequalContainer.style.display = "block";
+        equalContainer.style.display = "none";
+      } else {
+        unequalContainer.style.display = "none";
+        equalContainer.style.display = "block";
+      }
+    }
+
+    equalRadio.addEventListener("change", toggleSplitContainers);
+    unequalRadio.addEventListener("change", toggleSplitContainers);
+    toggleSplitContainers();
+  });
+</script>

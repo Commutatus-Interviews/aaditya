@@ -1,0 +1,8 @@
+<h1><%= @friend.email %>'s Expenses</h1>
+
+<% @expenses.each do |expense| %>
+  <p>
+    <strong><%= expense.description %></strong> - 
+    <%= number_to_currency(expense.total_amount) %> on <%= expense.date %>
+  </p>
+<% end %>
